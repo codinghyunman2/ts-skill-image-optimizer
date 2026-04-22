@@ -399,13 +399,39 @@ else:
     print(f"저장 위치: {out_dir}")
 ```
 
-임시 파일 경로를 감지한 뒤 스크립트를 저장하고 실행한다:
+**주의**: `Write` 도구는 기존 파일을 먼저 읽어야 하므로 새 임시 파일에 사용할 수 없다. OS에 따라 아래 방법으로 저장 후 실행한다.
+
+**Step 2에서 OS 타입을 추가로 감지한다:**
 
 ```bash
-# 크로스플랫폼 임시 경로 감지 (Mac: /tmp, Windows: %TEMP%)
-TMPFILE=$($PYTHON_CMD -c "import tempfile, os; print(os.path.join(tempfile.gettempdir(), 'image_optimizer_run.py'))")
-# 위 경로에 스크립트를 Write 도구로 저장한 뒤:
-$PYTHON_CMD "$TMPFILE"
+$PYTHON_CMD -c "import sys; print('windows' if sys.platform=='win32' else 'unix')"
+```
+
+- `unix` (Mac/Linux) → `cat` heredoc 방식 사용
+- `windows` → PowerShell here-string 방식 사용
+
+---
+
+**Mac/Linux — 단일 Bash 호출로 작성 + 실행:**
+
+```bash
+cat > /tmp/image_optimizer_run.py << 'PYEOF'
+[위 스크립트 전체 내용 — 파라미터를 실제 값으로 교체한 상태]
+PYEOF
+python3 /tmp/image_optimizer_run.py
+```
+
+heredoc 구분자는 반드시 `'PYEOF'`처럼 따옴표로 감싸야 변수 치환이 방지된다.
+
+---
+
+**Windows — PowerShell here-string 방식:**
+
+```powershell
+@'
+[위 스크립트 전체 내용 — 파라미터를 실제 값으로 교체한 상태]
+'@ | Set-Content -Path "$env:TEMP\image_optimizer_run.py" -Encoding UTF8
+python "$env:TEMP\image_optimizer_run.py"
 ```
 
 ### Step 5. 결과 리포트 출력

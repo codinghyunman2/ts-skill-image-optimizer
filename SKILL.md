@@ -126,7 +126,7 @@ if HEIC_OK:
     import pillow_heif; pillow_heif.register_heif_opener()
     SUPPORTED |= {'.heic', '.heif'}
 
-folder = Path(FOLDER)
+folder = Path(FOLDER).resolve()
 if not folder.exists():
     print('FOLDER_NOT_FOUND'); sys.exit(0)
 
@@ -208,7 +208,7 @@ SUPPORTED = {'.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp', '.tiff'}
 if HEIC_OK:
     SUPPORTED |= {'.heic', '.heif'}
 
-folder = Path(FOLDER)
+folder = Path(FOLDER).resolve()
 if not folder.exists():
     print(f"오류: '{FOLDER}' 폴더를 찾을 수 없습니다.")
     sys.exit(1)

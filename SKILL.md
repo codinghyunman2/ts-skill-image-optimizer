@@ -188,6 +188,7 @@ PRESET_MODE = None         # "cover" / "scale_crop" / None
 PRESET_LABEL = ""
 CROP_TOP = 0
 CROP_BOTTOM = 0
+TARGET_FINAL_HEIGHT = None # scale_crop 모드에서 최종 출력 높이 (presets의 target_height)
 EXACT_RESIZE = PRESET_MODE == 'cover'
 DRY_RUN = False            # --dry-run 플래그
 RECURSIVE = False          # --recursive 플래그
@@ -298,8 +299,15 @@ for img_path in sorted(files):
 
             # 리사이즈
             if PRESET_MODE == 'scale_crop':
-                scaled_h = round(original_h * TARGET_WIDTH / original_w)
-                img = img.resize((TARGET_WIDTH, scaled_h), Image.LANCZOS)
+                if TARGET_FINAL_HEIGHT:
+                    # target_height 지정 시: cover resize로 중간 높이를 정확히 맞춤
+                    # (소스 비율과 무관하게 항상 target_height 출력 보장)
+                    needed_h = CROP_TOP + TARGET_FINAL_HEIGHT + CROP_BOTTOM
+                    img = resize_cover(img, TARGET_WIDTH, needed_h)
+                    scaled_h = needed_h
+                else:
+                    scaled_h = round(original_h * TARGET_WIDTH / original_w)
+                    img = img.resize((TARGET_WIDTH, scaled_h), Image.LANCZOS)
                 # 안전 검사: 크롭 후 높이 유효성 확인
                 if scaled_h <= CROP_TOP + CROP_BOTTOM:
                     raise ValueError(

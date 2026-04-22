@@ -1,5 +1,5 @@
 {
   "iphone": { "mode": "cover", "width": 1284, "height": 2778 },
-  "ipad":   { "mode": "scale_crop", "width": 2048, "crop_top": 420, "crop_bottom": 420 },
+  "ipad":   { "mode": "scale_crop", "width": 2048, "crop_top": 420, "crop_bottom": 420, "target_height": 2732 },
   "google": { "mode": "cover", "width": 1440, "height": 3040 }
 }
